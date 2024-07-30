@@ -1,5 +1,5 @@
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DB_URL")
 }
 
@@ -42,12 +42,6 @@ model Donation {
   updatedAt DateTime @updatedAt
 }
 
-model Event {
-  createdAt DateTime @default(now())
-  id        String   @id @default(cuid())
-  updatedAt DateTime @updatedAt
-}
-
 model JobBoard {
   createdAt DateTime @default(now())
   id        String   @id @default(cuid())
@@ -66,19 +60,25 @@ model Geolocation {
   updatedAt DateTime @updatedAt
 }
 
+model Event {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
+}
+
 model NewsAnnouncement {
   createdAt DateTime @default(now())
   id        String   @id @default(cuid())
   updatedAt DateTime @updatedAt
 }
 
-model MentorshipProgram {
+model DiscussionForum {
   createdAt DateTime @default(now())
   id        String   @id @default(cuid())
   updatedAt DateTime @updatedAt
 }
 
-model DiscussionForum {
+model MentorshipProgram {
   createdAt DateTime @default(now())
   id        String   @id @default(cuid())
   updatedAt DateTime @updatedAt
@@ -95,6 +95,47 @@ model Admin {
   phoneNumber String?
   role        EnumAdminRole?
   updatedAt   DateTime       @updatedAt
+}
+
+model Job {
+  applicationUrl String?
+  company        String?
+  createdAt      DateTime @default(now())
+  description    String?
+  id             String   @id @default(cuid())
+  title          String?
+  updatedAt      DateTime @updatedAt
+}
+
+model News {
+  content       String?
+  createdAt     DateTime  @default(now())
+  datePublished DateTime?
+  id            String    @id @default(cuid())
+  title         String?
+  updatedAt     DateTime  @updatedAt
+}
+
+model User {
+  createdAt DateTime @default(now())
+  email     String?  @unique
+  firstName String?
+  id        String   @id @default(cuid())
+  lastName  String?
+  password  String
+  roles     Json
+  updatedAt DateTime @updatedAt
+  username  String   @unique
+}
+
+model EventItem {
+  createdAt   DateTime  @default(now())
+  date        DateTime?
+  description String?
+  id          String    @id @default(cuid())
+  location    String?
+  name        String?
+  updatedAt   DateTime  @updatedAt
 }
 
 enum EnumUserProfileBloodGroup {

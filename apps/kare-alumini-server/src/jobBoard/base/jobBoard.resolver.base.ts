@@ -13,16 +13,31 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { JobBoard } from "./JobBoard";
 import { JobBoardCountArgs } from "./JobBoardCountArgs";
 import { JobBoardFindManyArgs } from "./JobBoardFindManyArgs";
 import { JobBoardFindUniqueArgs } from "./JobBoardFindUniqueArgs";
 import { DeleteJobBoardArgs } from "./DeleteJobBoardArgs";
 import { JobBoardService } from "../jobBoard.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => JobBoard)
 export class JobBoardResolverBase {
-  constructor(protected readonly service: JobBoardService) {}
+  constructor(
+    protected readonly service: JobBoardService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "read",
+    possession: "any",
+  })
   async _jobBoardsMeta(
     @graphql.Args() args: JobBoardCountArgs
   ): Promise<MetaQueryPayload> {
@@ -32,14 +47,26 @@ export class JobBoardResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [JobBoard])
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "read",
+    possession: "any",
+  })
   async jobBoards(
     @graphql.Args() args: JobBoardFindManyArgs
   ): Promise<JobBoard[]> {
     return this.service.jobBoards(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => JobBoard, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "read",
+    possession: "own",
+  })
   async jobBoard(
     @graphql.Args() args: JobBoardFindUniqueArgs
   ): Promise<JobBoard | null> {
@@ -51,6 +78,11 @@ export class JobBoardResolverBase {
   }
 
   @graphql.Mutation(() => JobBoard)
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "delete",
+    possession: "any",
+  })
   async deleteJobBoard(
     @graphql.Args() args: DeleteJobBoardArgs
   ): Promise<JobBoard | null> {

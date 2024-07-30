@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { NewsAnnouncementService } from "../newsAnnouncement.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { NewsAnnouncementCreateInput } from "./NewsAnnouncementCreateInput";
 import { NewsAnnouncement } from "./NewsAnnouncement";
 import { NewsAnnouncementFindManyArgs } from "./NewsAnnouncementFindManyArgs";
 import { NewsAnnouncementWhereUniqueInput } from "./NewsAnnouncementWhereUniqueInput";
 import { NewsAnnouncementUpdateInput } from "./NewsAnnouncementUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class NewsAnnouncementControllerBase {
-  constructor(protected readonly service: NewsAnnouncementService) {}
+  constructor(
+    protected readonly service: NewsAnnouncementService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: NewsAnnouncement })
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createNewsAnnouncement(
     @common.Body() data: NewsAnnouncementCreateInput
   ): Promise<NewsAnnouncement> {
@@ -40,9 +58,18 @@ export class NewsAnnouncementControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [NewsAnnouncement] })
   @ApiNestedQuery(NewsAnnouncementFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async newsAnnouncements(
     @common.Req() request: Request
   ): Promise<NewsAnnouncement[]> {
@@ -57,9 +84,18 @@ export class NewsAnnouncementControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: NewsAnnouncement })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async newsAnnouncement(
     @common.Param() params: NewsAnnouncementWhereUniqueInput
   ): Promise<NewsAnnouncement | null> {
@@ -79,9 +115,18 @@ export class NewsAnnouncementControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: NewsAnnouncement })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateNewsAnnouncement(
     @common.Param() params: NewsAnnouncementWhereUniqueInput,
     @common.Body() data: NewsAnnouncementUpdateInput
@@ -109,6 +154,14 @@ export class NewsAnnouncementControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: NewsAnnouncement })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteNewsAnnouncement(
     @common.Param() params: NewsAnnouncementWhereUniqueInput
   ): Promise<NewsAnnouncement | null> {

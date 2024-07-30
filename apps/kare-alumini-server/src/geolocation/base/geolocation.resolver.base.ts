@@ -13,16 +13,31 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { Geolocation } from "./Geolocation";
 import { GeolocationCountArgs } from "./GeolocationCountArgs";
 import { GeolocationFindManyArgs } from "./GeolocationFindManyArgs";
 import { GeolocationFindUniqueArgs } from "./GeolocationFindUniqueArgs";
 import { DeleteGeolocationArgs } from "./DeleteGeolocationArgs";
 import { GeolocationService } from "../geolocation.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Geolocation)
 export class GeolocationResolverBase {
-  constructor(protected readonly service: GeolocationService) {}
+  constructor(
+    protected readonly service: GeolocationService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "read",
+    possession: "any",
+  })
   async _geolocationsMeta(
     @graphql.Args() args: GeolocationCountArgs
   ): Promise<MetaQueryPayload> {
@@ -32,14 +47,26 @@ export class GeolocationResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [Geolocation])
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "read",
+    possession: "any",
+  })
   async geolocations(
     @graphql.Args() args: GeolocationFindManyArgs
   ): Promise<Geolocation[]> {
     return this.service.geolocations(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => Geolocation, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "read",
+    possession: "own",
+  })
   async geolocation(
     @graphql.Args() args: GeolocationFindUniqueArgs
   ): Promise<Geolocation | null> {
@@ -51,6 +78,11 @@ export class GeolocationResolverBase {
   }
 
   @graphql.Mutation(() => Geolocation)
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "delete",
+    possession: "any",
+  })
   async deleteGeolocation(
     @graphql.Args() args: DeleteGeolocationArgs
   ): Promise<Geolocation | null> {

@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { JobBoardService } from "../jobBoard.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { JobBoardCreateInput } from "./JobBoardCreateInput";
 import { JobBoard } from "./JobBoard";
 import { JobBoardFindManyArgs } from "./JobBoardFindManyArgs";
 import { JobBoardWhereUniqueInput } from "./JobBoardWhereUniqueInput";
 import { JobBoardUpdateInput } from "./JobBoardUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class JobBoardControllerBase {
-  constructor(protected readonly service: JobBoardService) {}
+  constructor(
+    protected readonly service: JobBoardService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: JobBoard })
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createJobBoard(
     @common.Body() data: JobBoardCreateInput
   ): Promise<JobBoard> {
@@ -40,9 +58,18 @@ export class JobBoardControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [JobBoard] })
   @ApiNestedQuery(JobBoardFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async jobBoards(@common.Req() request: Request): Promise<JobBoard[]> {
     const args = plainToClass(JobBoardFindManyArgs, request.query);
     return this.service.jobBoards({
@@ -55,9 +82,18 @@ export class JobBoardControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: JobBoard })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async jobBoard(
     @common.Param() params: JobBoardWhereUniqueInput
   ): Promise<JobBoard | null> {
@@ -77,9 +113,18 @@ export class JobBoardControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: JobBoard })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateJobBoard(
     @common.Param() params: JobBoardWhereUniqueInput,
     @common.Body() data: JobBoardUpdateInput
@@ -107,6 +152,14 @@ export class JobBoardControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: JobBoard })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "JobBoard",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteJobBoard(
     @common.Param() params: JobBoardWhereUniqueInput
   ): Promise<JobBoard | null> {

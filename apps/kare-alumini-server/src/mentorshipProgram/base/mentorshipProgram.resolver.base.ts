@@ -13,16 +13,31 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { MentorshipProgram } from "./MentorshipProgram";
 import { MentorshipProgramCountArgs } from "./MentorshipProgramCountArgs";
 import { MentorshipProgramFindManyArgs } from "./MentorshipProgramFindManyArgs";
 import { MentorshipProgramFindUniqueArgs } from "./MentorshipProgramFindUniqueArgs";
 import { DeleteMentorshipProgramArgs } from "./DeleteMentorshipProgramArgs";
 import { MentorshipProgramService } from "../mentorshipProgram.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => MentorshipProgram)
 export class MentorshipProgramResolverBase {
-  constructor(protected readonly service: MentorshipProgramService) {}
+  constructor(
+    protected readonly service: MentorshipProgramService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "read",
+    possession: "any",
+  })
   async _mentorshipProgramsMeta(
     @graphql.Args() args: MentorshipProgramCountArgs
   ): Promise<MetaQueryPayload> {
@@ -32,14 +47,26 @@ export class MentorshipProgramResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [MentorshipProgram])
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "read",
+    possession: "any",
+  })
   async mentorshipPrograms(
     @graphql.Args() args: MentorshipProgramFindManyArgs
   ): Promise<MentorshipProgram[]> {
     return this.service.mentorshipPrograms(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => MentorshipProgram, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "read",
+    possession: "own",
+  })
   async mentorshipProgram(
     @graphql.Args() args: MentorshipProgramFindUniqueArgs
   ): Promise<MentorshipProgram | null> {
@@ -51,6 +78,11 @@ export class MentorshipProgramResolverBase {
   }
 
   @graphql.Mutation(() => MentorshipProgram)
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "delete",
+    possession: "any",
+  })
   async deleteMentorshipProgram(
     @graphql.Args() args: DeleteMentorshipProgramArgs
   ): Promise<MentorshipProgram | null> {
