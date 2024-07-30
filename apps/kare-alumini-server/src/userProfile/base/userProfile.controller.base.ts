@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { UserProfileService } from "../userProfile.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { UserProfileCreateInput } from "./UserProfileCreateInput";
 import { UserProfile } from "./UserProfile";
 import { UserProfileFindManyArgs } from "./UserProfileFindManyArgs";
 import { UserProfileWhereUniqueInput } from "./UserProfileWhereUniqueInput";
 import { UserProfileUpdateInput } from "./UserProfileUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class UserProfileControllerBase {
-  constructor(protected readonly service: UserProfileService) {}
+  constructor(
+    protected readonly service: UserProfileService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: UserProfile })
+  @nestAccessControl.UseRoles({
+    resource: "UserProfile",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createUserProfile(
     @common.Body() data: UserProfileCreateInput
   ): Promise<UserProfile> {
@@ -57,9 +75,18 @@ export class UserProfileControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [UserProfile] })
   @ApiNestedQuery(UserProfileFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "UserProfile",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async userProfiles(@common.Req() request: Request): Promise<UserProfile[]> {
     const args = plainToClass(UserProfileFindManyArgs, request.query);
     return this.service.userProfiles({
@@ -89,9 +116,18 @@ export class UserProfileControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: UserProfile })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "UserProfile",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async userProfile(
     @common.Param() params: UserProfileWhereUniqueInput
   ): Promise<UserProfile | null> {
@@ -128,9 +164,18 @@ export class UserProfileControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: UserProfile })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "UserProfile",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateUserProfile(
     @common.Param() params: UserProfileWhereUniqueInput,
     @common.Body() data: UserProfileUpdateInput
@@ -175,6 +220,14 @@ export class UserProfileControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: UserProfile })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "UserProfile",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteUserProfile(
     @common.Param() params: UserProfileWhereUniqueInput
   ): Promise<UserProfile | null> {

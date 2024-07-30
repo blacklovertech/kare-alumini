@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { MentorshipProgramService } from "../mentorshipProgram.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { MentorshipProgramCreateInput } from "./MentorshipProgramCreateInput";
 import { MentorshipProgram } from "./MentorshipProgram";
 import { MentorshipProgramFindManyArgs } from "./MentorshipProgramFindManyArgs";
 import { MentorshipProgramWhereUniqueInput } from "./MentorshipProgramWhereUniqueInput";
 import { MentorshipProgramUpdateInput } from "./MentorshipProgramUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class MentorshipProgramControllerBase {
-  constructor(protected readonly service: MentorshipProgramService) {}
+  constructor(
+    protected readonly service: MentorshipProgramService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: MentorshipProgram })
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createMentorshipProgram(
     @common.Body() data: MentorshipProgramCreateInput
   ): Promise<MentorshipProgram> {
@@ -40,9 +58,18 @@ export class MentorshipProgramControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [MentorshipProgram] })
   @ApiNestedQuery(MentorshipProgramFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async mentorshipPrograms(
     @common.Req() request: Request
   ): Promise<MentorshipProgram[]> {
@@ -57,9 +84,18 @@ export class MentorshipProgramControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: MentorshipProgram })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async mentorshipProgram(
     @common.Param() params: MentorshipProgramWhereUniqueInput
   ): Promise<MentorshipProgram | null> {
@@ -79,9 +115,18 @@ export class MentorshipProgramControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: MentorshipProgram })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateMentorshipProgram(
     @common.Param() params: MentorshipProgramWhereUniqueInput,
     @common.Body() data: MentorshipProgramUpdateInput
@@ -109,6 +154,14 @@ export class MentorshipProgramControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: MentorshipProgram })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "MentorshipProgram",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteMentorshipProgram(
     @common.Param() params: MentorshipProgramWhereUniqueInput
   ): Promise<MentorshipProgram | null> {

@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { ResourceLibraryService } from "../resourceLibrary.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { ResourceLibraryCreateInput } from "./ResourceLibraryCreateInput";
 import { ResourceLibrary } from "./ResourceLibrary";
 import { ResourceLibraryFindManyArgs } from "./ResourceLibraryFindManyArgs";
 import { ResourceLibraryWhereUniqueInput } from "./ResourceLibraryWhereUniqueInput";
 import { ResourceLibraryUpdateInput } from "./ResourceLibraryUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class ResourceLibraryControllerBase {
-  constructor(protected readonly service: ResourceLibraryService) {}
+  constructor(
+    protected readonly service: ResourceLibraryService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: ResourceLibrary })
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createResourceLibrary(
     @common.Body() data: ResourceLibraryCreateInput
   ): Promise<ResourceLibrary> {
@@ -40,9 +58,18 @@ export class ResourceLibraryControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [ResourceLibrary] })
   @ApiNestedQuery(ResourceLibraryFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async resourceLibraries(
     @common.Req() request: Request
   ): Promise<ResourceLibrary[]> {
@@ -57,9 +84,18 @@ export class ResourceLibraryControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: ResourceLibrary })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async resourceLibrary(
     @common.Param() params: ResourceLibraryWhereUniqueInput
   ): Promise<ResourceLibrary | null> {
@@ -79,9 +115,18 @@ export class ResourceLibraryControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: ResourceLibrary })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateResourceLibrary(
     @common.Param() params: ResourceLibraryWhereUniqueInput,
     @common.Body() data: ResourceLibraryUpdateInput
@@ -109,6 +154,14 @@ export class ResourceLibraryControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: ResourceLibrary })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteResourceLibrary(
     @common.Param() params: ResourceLibraryWhereUniqueInput
   ): Promise<ResourceLibrary | null> {

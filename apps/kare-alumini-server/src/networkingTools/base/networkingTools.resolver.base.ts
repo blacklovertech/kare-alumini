@@ -13,16 +13,31 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { NetworkingTools } from "./NetworkingTools";
 import { NetworkingToolsCountArgs } from "./NetworkingToolsCountArgs";
 import { NetworkingToolsFindManyArgs } from "./NetworkingToolsFindManyArgs";
 import { NetworkingToolsFindUniqueArgs } from "./NetworkingToolsFindUniqueArgs";
 import { DeleteNetworkingToolsArgs } from "./DeleteNetworkingToolsArgs";
 import { NetworkingToolsService } from "../networkingTools.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => NetworkingTools)
 export class NetworkingToolsResolverBase {
-  constructor(protected readonly service: NetworkingToolsService) {}
+  constructor(
+    protected readonly service: NetworkingToolsService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "read",
+    possession: "any",
+  })
   async _networkingToolsItemsMeta(
     @graphql.Args() args: NetworkingToolsCountArgs
   ): Promise<MetaQueryPayload> {
@@ -32,14 +47,26 @@ export class NetworkingToolsResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [NetworkingTools])
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "read",
+    possession: "any",
+  })
   async networkingToolsItems(
     @graphql.Args() args: NetworkingToolsFindManyArgs
   ): Promise<NetworkingTools[]> {
     return this.service.networkingToolsItems(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => NetworkingTools, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "read",
+    possession: "own",
+  })
   async networkingTools(
     @graphql.Args() args: NetworkingToolsFindUniqueArgs
   ): Promise<NetworkingTools | null> {
@@ -51,6 +78,11 @@ export class NetworkingToolsResolverBase {
   }
 
   @graphql.Mutation(() => NetworkingTools)
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "delete",
+    possession: "any",
+  })
   async deleteNetworkingTools(
     @graphql.Args() args: DeleteNetworkingToolsArgs
   ): Promise<NetworkingTools | null> {

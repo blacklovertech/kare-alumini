@@ -13,16 +13,31 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { ResourceLibrary } from "./ResourceLibrary";
 import { ResourceLibraryCountArgs } from "./ResourceLibraryCountArgs";
 import { ResourceLibraryFindManyArgs } from "./ResourceLibraryFindManyArgs";
 import { ResourceLibraryFindUniqueArgs } from "./ResourceLibraryFindUniqueArgs";
 import { DeleteResourceLibraryArgs } from "./DeleteResourceLibraryArgs";
 import { ResourceLibraryService } from "../resourceLibrary.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => ResourceLibrary)
 export class ResourceLibraryResolverBase {
-  constructor(protected readonly service: ResourceLibraryService) {}
+  constructor(
+    protected readonly service: ResourceLibraryService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "read",
+    possession: "any",
+  })
   async _resourceLibrariesMeta(
     @graphql.Args() args: ResourceLibraryCountArgs
   ): Promise<MetaQueryPayload> {
@@ -32,14 +47,26 @@ export class ResourceLibraryResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [ResourceLibrary])
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "read",
+    possession: "any",
+  })
   async resourceLibraries(
     @graphql.Args() args: ResourceLibraryFindManyArgs
   ): Promise<ResourceLibrary[]> {
     return this.service.resourceLibraries(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => ResourceLibrary, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "read",
+    possession: "own",
+  })
   async resourceLibrary(
     @graphql.Args() args: ResourceLibraryFindUniqueArgs
   ): Promise<ResourceLibrary | null> {
@@ -51,6 +78,11 @@ export class ResourceLibraryResolverBase {
   }
 
   @graphql.Mutation(() => ResourceLibrary)
+  @nestAccessControl.UseRoles({
+    resource: "ResourceLibrary",
+    action: "delete",
+    possession: "any",
+  })
   async deleteResourceLibrary(
     @graphql.Args() args: DeleteResourceLibraryArgs
   ): Promise<ResourceLibrary | null> {

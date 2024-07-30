@@ -13,16 +13,31 @@ import * as graphql from "@nestjs/graphql";
 import { GraphQLError } from "graphql";
 import { isRecordNotFoundError } from "../../prisma.util";
 import { MetaQueryPayload } from "../../util/MetaQueryPayload";
+import * as nestAccessControl from "nest-access-control";
+import * as gqlACGuard from "../../auth/gqlAC.guard";
+import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
+import * as common from "@nestjs/common";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { NewsAnnouncement } from "./NewsAnnouncement";
 import { NewsAnnouncementCountArgs } from "./NewsAnnouncementCountArgs";
 import { NewsAnnouncementFindManyArgs } from "./NewsAnnouncementFindManyArgs";
 import { NewsAnnouncementFindUniqueArgs } from "./NewsAnnouncementFindUniqueArgs";
 import { DeleteNewsAnnouncementArgs } from "./DeleteNewsAnnouncementArgs";
 import { NewsAnnouncementService } from "../newsAnnouncement.service";
+@common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => NewsAnnouncement)
 export class NewsAnnouncementResolverBase {
-  constructor(protected readonly service: NewsAnnouncementService) {}
+  constructor(
+    protected readonly service: NewsAnnouncementService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
 
+  @graphql.Query(() => MetaQueryPayload)
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "read",
+    possession: "any",
+  })
   async _newsAnnouncementsMeta(
     @graphql.Args() args: NewsAnnouncementCountArgs
   ): Promise<MetaQueryPayload> {
@@ -32,14 +47,26 @@ export class NewsAnnouncementResolverBase {
     };
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => [NewsAnnouncement])
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "read",
+    possession: "any",
+  })
   async newsAnnouncements(
     @graphql.Args() args: NewsAnnouncementFindManyArgs
   ): Promise<NewsAnnouncement[]> {
     return this.service.newsAnnouncements(args);
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @graphql.Query(() => NewsAnnouncement, { nullable: true })
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "read",
+    possession: "own",
+  })
   async newsAnnouncement(
     @graphql.Args() args: NewsAnnouncementFindUniqueArgs
   ): Promise<NewsAnnouncement | null> {
@@ -51,6 +78,11 @@ export class NewsAnnouncementResolverBase {
   }
 
   @graphql.Mutation(() => NewsAnnouncement)
+  @nestAccessControl.UseRoles({
+    resource: "NewsAnnouncement",
+    action: "delete",
+    possession: "any",
+  })
   async deleteNewsAnnouncement(
     @graphql.Args() args: DeleteNewsAnnouncementArgs
   ): Promise<NewsAnnouncement | null> {

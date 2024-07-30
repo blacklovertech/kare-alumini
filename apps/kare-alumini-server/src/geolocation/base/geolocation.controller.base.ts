@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { GeolocationService } from "../geolocation.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { GeolocationCreateInput } from "./GeolocationCreateInput";
 import { Geolocation } from "./Geolocation";
 import { GeolocationFindManyArgs } from "./GeolocationFindManyArgs";
 import { GeolocationWhereUniqueInput } from "./GeolocationWhereUniqueInput";
 import { GeolocationUpdateInput } from "./GeolocationUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class GeolocationControllerBase {
-  constructor(protected readonly service: GeolocationService) {}
+  constructor(
+    protected readonly service: GeolocationService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: Geolocation })
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createGeolocation(
     @common.Body() data: GeolocationCreateInput
   ): Promise<Geolocation> {
@@ -40,9 +58,18 @@ export class GeolocationControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [Geolocation] })
   @ApiNestedQuery(GeolocationFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async geolocations(@common.Req() request: Request): Promise<Geolocation[]> {
     const args = plainToClass(GeolocationFindManyArgs, request.query);
     return this.service.geolocations({
@@ -55,9 +82,18 @@ export class GeolocationControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: Geolocation })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async geolocation(
     @common.Param() params: GeolocationWhereUniqueInput
   ): Promise<Geolocation | null> {
@@ -77,9 +113,18 @@ export class GeolocationControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: Geolocation })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateGeolocation(
     @common.Param() params: GeolocationWhereUniqueInput,
     @common.Body() data: GeolocationUpdateInput
@@ -107,6 +152,14 @@ export class GeolocationControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: Geolocation })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "Geolocation",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteGeolocation(
     @common.Param() params: GeolocationWhereUniqueInput
   ): Promise<Geolocation | null> {

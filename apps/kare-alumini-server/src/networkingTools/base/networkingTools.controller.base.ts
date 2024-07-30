@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { NetworkingToolsService } from "../networkingTools.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { NetworkingToolsCreateInput } from "./NetworkingToolsCreateInput";
 import { NetworkingTools } from "./NetworkingTools";
 import { NetworkingToolsFindManyArgs } from "./NetworkingToolsFindManyArgs";
 import { NetworkingToolsWhereUniqueInput } from "./NetworkingToolsWhereUniqueInput";
 import { NetworkingToolsUpdateInput } from "./NetworkingToolsUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class NetworkingToolsControllerBase {
-  constructor(protected readonly service: NetworkingToolsService) {}
+  constructor(
+    protected readonly service: NetworkingToolsService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: NetworkingTools })
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createNetworkingTools(
     @common.Body() data: NetworkingToolsCreateInput
   ): Promise<NetworkingTools> {
@@ -40,9 +58,18 @@ export class NetworkingToolsControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [NetworkingTools] })
   @ApiNestedQuery(NetworkingToolsFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async networkingToolsItems(
     @common.Req() request: Request
   ): Promise<NetworkingTools[]> {
@@ -57,9 +84,18 @@ export class NetworkingToolsControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: NetworkingTools })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async networkingTools(
     @common.Param() params: NetworkingToolsWhereUniqueInput
   ): Promise<NetworkingTools | null> {
@@ -79,9 +115,18 @@ export class NetworkingToolsControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: NetworkingTools })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateNetworkingTools(
     @common.Param() params: NetworkingToolsWhereUniqueInput,
     @common.Body() data: NetworkingToolsUpdateInput
@@ -109,6 +154,14 @@ export class NetworkingToolsControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: NetworkingTools })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "NetworkingTools",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteNetworkingTools(
     @common.Param() params: NetworkingToolsWhereUniqueInput
   ): Promise<NetworkingTools | null> {

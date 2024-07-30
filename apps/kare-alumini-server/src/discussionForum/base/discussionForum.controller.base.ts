@@ -16,17 +16,35 @@ import * as errors from "../../errors";
 import { Request } from "express";
 import { plainToClass } from "class-transformer";
 import { ApiNestedQuery } from "../../decorators/api-nested-query.decorator";
+import * as nestAccessControl from "nest-access-control";
+import * as defaultAuthGuard from "../../auth/defaultAuth.guard";
 import { DiscussionForumService } from "../discussionForum.service";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
+import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
 import { DiscussionForumCreateInput } from "./DiscussionForumCreateInput";
 import { DiscussionForum } from "./DiscussionForum";
 import { DiscussionForumFindManyArgs } from "./DiscussionForumFindManyArgs";
 import { DiscussionForumWhereUniqueInput } from "./DiscussionForumWhereUniqueInput";
 import { DiscussionForumUpdateInput } from "./DiscussionForumUpdateInput";
 
+@swagger.ApiBearerAuth()
+@common.UseGuards(defaultAuthGuard.DefaultAuthGuard, nestAccessControl.ACGuard)
 export class DiscussionForumControllerBase {
-  constructor(protected readonly service: DiscussionForumService) {}
+  constructor(
+    protected readonly service: DiscussionForumService,
+    protected readonly rolesBuilder: nestAccessControl.RolesBuilder
+  ) {}
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Post()
   @swagger.ApiCreatedResponse({ type: DiscussionForum })
+  @nestAccessControl.UseRoles({
+    resource: "DiscussionForum",
+    action: "create",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async createDiscussionForum(
     @common.Body() data: DiscussionForumCreateInput
   ): Promise<DiscussionForum> {
@@ -40,9 +58,18 @@ export class DiscussionForumControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get()
   @swagger.ApiOkResponse({ type: [DiscussionForum] })
   @ApiNestedQuery(DiscussionForumFindManyArgs)
+  @nestAccessControl.UseRoles({
+    resource: "DiscussionForum",
+    action: "read",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async discussionForums(
     @common.Req() request: Request
   ): Promise<DiscussionForum[]> {
@@ -57,9 +84,18 @@ export class DiscussionForumControllerBase {
     });
   }
 
+  @common.UseInterceptors(AclFilterResponseInterceptor)
   @common.Get("/:id")
   @swagger.ApiOkResponse({ type: DiscussionForum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "DiscussionForum",
+    action: "read",
+    possession: "own",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async discussionForum(
     @common.Param() params: DiscussionForumWhereUniqueInput
   ): Promise<DiscussionForum | null> {
@@ -79,9 +115,18 @@ export class DiscussionForumControllerBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
   @common.Patch("/:id")
   @swagger.ApiOkResponse({ type: DiscussionForum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "DiscussionForum",
+    action: "update",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async updateDiscussionForum(
     @common.Param() params: DiscussionForumWhereUniqueInput,
     @common.Body() data: DiscussionForumUpdateInput
@@ -109,6 +154,14 @@ export class DiscussionForumControllerBase {
   @common.Delete("/:id")
   @swagger.ApiOkResponse({ type: DiscussionForum })
   @swagger.ApiNotFoundResponse({ type: errors.NotFoundException })
+  @nestAccessControl.UseRoles({
+    resource: "DiscussionForum",
+    action: "delete",
+    possession: "any",
+  })
+  @swagger.ApiForbiddenResponse({
+    type: errors.ForbiddenException,
+  })
   async deleteDiscussionForum(
     @common.Param() params: DiscussionForumWhereUniqueInput
   ): Promise<DiscussionForum | null> {
