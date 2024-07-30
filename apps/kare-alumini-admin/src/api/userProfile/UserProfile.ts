@@ -1,4 +1,6 @@
 export type UserProfile = {
+  address: string | null;
+  bloodGroup?: "Option1" | null;
   createdAt: Date;
   currentCompany: string | null;
   currentRole: string | null;
@@ -15,5 +17,6 @@ export type UserProfile = {
   phoneNumber: string | null;
   postEvents: boolean | null;
   postNews: boolean | null;
+  regNo: string | null;
   updatedAt: Date;
 };

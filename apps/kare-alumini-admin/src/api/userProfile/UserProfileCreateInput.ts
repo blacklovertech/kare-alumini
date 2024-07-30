@@ -1,4 +1,6 @@
 export type UserProfileCreateInput = {
+  address?: string | null;
+  bloodGroup?: "Option1" | null;
   currentCompany?: string | null;
   currentRole?: string | null;
   deptOfStudy?: string | null;
@@ -13,4 +15,5 @@ export type UserProfileCreateInput = {
   phoneNumber?: string | null;
   postEvents?: boolean | null;
   postNews?: boolean | null;
+  regNo?: string | null;
 };

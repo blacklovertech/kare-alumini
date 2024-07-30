@@ -4,6 +4,8 @@ import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 export type UserProfileWhereInput = {
+  address?: StringNullableFilter;
+  bloodGroup?: "Option1";
   currentCompany?: StringNullableFilter;
   currentRole?: StringNullableFilter;
   deptOfStudy?: StringNullableFilter;
@@ -19,4 +21,5 @@ export type UserProfileWhereInput = {
   phoneNumber?: StringNullableFilter;
   postEvents?: BooleanNullableFilter;
   postNews?: BooleanNullableFilter;
+  regNo?: StringNullableFilter;
 };

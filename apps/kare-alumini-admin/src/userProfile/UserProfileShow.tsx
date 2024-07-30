@@ -3,8 +3,8 @@ import {
   Show,
   SimpleShowLayout,
   ShowProps,
-  DateField,
   TextField,
+  DateField,
   BooleanField,
 } from "react-admin";
 
@@ -12,6 +12,8 @@ export const UserProfileShow = (props: ShowProps): React.ReactElement => {
   return (
     <Show {...props}>
       <SimpleShowLayout>
+        <TextField label="Address" source="address" />
+        <TextField label="BloodGroup" source="bloodGroup" />
         <DateField source="createdAt" label="Created At" />
         <TextField label="CurrentCompany" source="currentCompany" />
         <TextField label="CurrentRole" source="currentRole" />
@@ -28,6 +30,7 @@ export const UserProfileShow = (props: ShowProps): React.ReactElement => {
         <TextField label="PhoneNumber" source="phoneNumber" />
         <BooleanField label="PostEvents" source="postEvents" />
         <BooleanField label="PostNews" source="postNews" />
+        <TextField label="RegNo" source="regNo" />
         <DateField source="updatedAt" label="Updated At" />
       </SimpleShowLayout>
     </Show>

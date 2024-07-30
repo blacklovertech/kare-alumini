@@ -15,14 +15,39 @@ import {
   IsString,
   MaxLength,
   IsOptional,
+  IsEnum,
   IsBoolean,
   IsInt,
   Min,
   Max,
 } from "class-validator";
+import { EnumUserProfileBloodGroup } from "./EnumUserProfileBloodGroup";
 
 @InputType()
 class UserProfileCreateInput {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  address?: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumUserProfileBloodGroup,
+  })
+  @IsEnum(EnumUserProfileBloodGroup)
+  @IsOptional()
+  @Field(() => EnumUserProfileBloodGroup, {
+    nullable: true,
+  })
+  bloodGroup?: "Option1" | null;
+
   @ApiProperty({
     required: false,
     type: String,
@@ -187,6 +212,18 @@ class UserProfileCreateInput {
     nullable: true,
   })
   postNews?: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  regNo?: string | null;
 }
 
 export { UserProfileCreateInput as UserProfileCreateInput };

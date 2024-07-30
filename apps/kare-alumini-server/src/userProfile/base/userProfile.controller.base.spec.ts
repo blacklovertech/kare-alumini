@@ -18,6 +18,7 @@ import { UserProfileService } from "../userProfile.service";
 const nonExistingId = "nonExistingId";
 const existingId = "existingId";
 const CREATE_INPUT = {
+  address: "exampleAddress",
   createdAt: new Date(),
   currentCompany: "exampleCurrentCompany",
   currentRole: "exampleCurrentRole",
@@ -34,9 +35,11 @@ const CREATE_INPUT = {
   phoneNumber: "examplePhoneNumber",
   postEvents: "true",
   postNews: "true",
+  regNo: "exampleRegNo",
   updatedAt: new Date(),
 };
 const CREATE_RESULT = {
+  address: "exampleAddress",
   createdAt: new Date(),
   currentCompany: "exampleCurrentCompany",
   currentRole: "exampleCurrentRole",
@@ -53,10 +56,12 @@ const CREATE_RESULT = {
   phoneNumber: "examplePhoneNumber",
   postEvents: "true",
   postNews: "true",
+  regNo: "exampleRegNo",
   updatedAt: new Date(),
 };
 const FIND_MANY_RESULT = [
   {
+    address: "exampleAddress",
     createdAt: new Date(),
     currentCompany: "exampleCurrentCompany",
     currentRole: "exampleCurrentRole",
@@ -73,10 +78,12 @@ const FIND_MANY_RESULT = [
     phoneNumber: "examplePhoneNumber",
     postEvents: "true",
     postNews: "true",
+    regNo: "exampleRegNo",
     updatedAt: new Date(),
   },
 ];
 const FIND_ONE_RESULT = {
+  address: "exampleAddress",
   createdAt: new Date(),
   currentCompany: "exampleCurrentCompany",
   currentRole: "exampleCurrentRole",
@@ -93,6 +100,7 @@ const FIND_ONE_RESULT = {
   phoneNumber: "examplePhoneNumber",
   postEvents: "true",
   postNews: "true",
+  regNo: "exampleRegNo",
   updatedAt: new Date(),
 };
 
