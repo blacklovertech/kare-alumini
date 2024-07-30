@@ -11,11 +11,20 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString, IsOptional, MaxLength } from "class-validator";
+import {
+  IsDate,
+  IsString,
+  IsOptional,
+  ValidateNested,
+  MaxLength,
+} from "class-validator";
 import { Type } from "class-transformer";
+import { EventRegistration } from "../../eventRegistration/base/EventRegistration";
+import { Profile } from "../../profile/base/Profile";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { JsonValue } from "type-fest";
+import { UserRole } from "../../userRole/base/UserRole";
 
 @ObjectType()
 class User {
@@ -37,6 +46,15 @@ class User {
     nullable: true,
   })
   email!: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EventRegistration],
+  })
+  @ValidateNested()
+  @Type(() => EventRegistration)
+  @IsOptional()
+  eventRegistrations?: Array<EventRegistration>;
 
   @ApiProperty({
     required: false,
@@ -71,6 +89,15 @@ class User {
   lastName!: string | null;
 
   @ApiProperty({
+    required: false,
+    type: () => [Profile],
+  })
+  @ValidateNested()
+  @Type(() => Profile)
+  @IsOptional()
+  profiles?: Array<Profile>;
+
+  @ApiProperty({
     required: true,
   })
   @IsJSONValue()
@@ -84,6 +111,15 @@ class User {
   @Type(() => Date)
   @Field(() => Date)
   updatedAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: () => [UserRole],
+  })
+  @ValidateNested()
+  @Type(() => UserRole)
+  @IsOptional()
+  userRoles?: Array<UserRole>;
 
   @ApiProperty({
     required: true,

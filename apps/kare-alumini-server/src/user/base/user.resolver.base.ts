@@ -26,6 +26,12 @@ import { UserFindUniqueArgs } from "./UserFindUniqueArgs";
 import { CreateUserArgs } from "./CreateUserArgs";
 import { UpdateUserArgs } from "./UpdateUserArgs";
 import { DeleteUserArgs } from "./DeleteUserArgs";
+import { EventRegistrationFindManyArgs } from "../../eventRegistration/base/EventRegistrationFindManyArgs";
+import { EventRegistration } from "../../eventRegistration/base/EventRegistration";
+import { ProfileFindManyArgs } from "../../profile/base/ProfileFindManyArgs";
+import { Profile } from "../../profile/base/Profile";
+import { UserRoleFindManyArgs } from "../../userRole/base/UserRoleFindManyArgs";
+import { UserRole } from "../../userRole/base/UserRole";
 import { UserService } from "../user.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => User)
@@ -130,5 +136,67 @@ export class UserResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [EventRegistration], {
+    name: "eventRegistrations",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "EventRegistration",
+    action: "read",
+    possession: "any",
+  })
+  async findEventRegistrations(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: EventRegistrationFindManyArgs
+  ): Promise<EventRegistration[]> {
+    const results = await this.service.findEventRegistrations(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [Profile], { name: "profiles" })
+  @nestAccessControl.UseRoles({
+    resource: "Profile",
+    action: "read",
+    possession: "any",
+  })
+  async findProfiles(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: ProfileFindManyArgs
+  ): Promise<Profile[]> {
+    const results = await this.service.findProfiles(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [UserRole], { name: "userRoles" })
+  @nestAccessControl.UseRoles({
+    resource: "UserRole",
+    action: "read",
+    possession: "any",
+  })
+  async findUserRoles(
+    @graphql.Parent() parent: User,
+    @graphql.Args() args: UserRoleFindManyArgs
+  ): Promise<UserRole[]> {
+    const results = await this.service.findUserRoles(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 }

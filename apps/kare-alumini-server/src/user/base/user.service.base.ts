@@ -10,7 +10,15 @@ https://docs.amplication.com/how-to/custom-code
 ------------------------------------------------------------------------------
   */
 import { PrismaService } from "../../prisma/prisma.service";
-import { Prisma, User as PrismaUser } from "@prisma/client";
+
+import {
+  Prisma,
+  User as PrismaUser,
+  EventRegistration as PrismaEventRegistration,
+  Profile as PrismaProfile,
+  UserRole as PrismaUserRole,
+} from "@prisma/client";
+
 import { PasswordService } from "../../auth/password.service";
 import { transformStringFieldUpdateInput } from "../../prisma.util";
 
@@ -58,5 +66,38 @@ export class UserServiceBase {
   }
   async deleteUser(args: Prisma.UserDeleteArgs): Promise<PrismaUser> {
     return this.prisma.user.delete(args);
+  }
+
+  async findEventRegistrations(
+    parentId: string,
+    args: Prisma.EventRegistrationFindManyArgs
+  ): Promise<PrismaEventRegistration[]> {
+    return this.prisma.user
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .eventRegistrations(args);
+  }
+
+  async findProfiles(
+    parentId: string,
+    args: Prisma.ProfileFindManyArgs
+  ): Promise<PrismaProfile[]> {
+    return this.prisma.user
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .profiles(args);
+  }
+
+  async findUserRoles(
+    parentId: string,
+    args: Prisma.UserRoleFindManyArgs
+  ): Promise<PrismaUserRole[]> {
+    return this.prisma.user
+      .findUniqueOrThrow({
+        where: { id: parentId },
+      })
+      .userRoles(args);
   }
 }

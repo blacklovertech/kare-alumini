@@ -11,8 +11,9 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsDate, IsString } from "class-validator";
+import { IsDate, ValidateNested, IsOptional, IsString } from "class-validator";
 import { Type } from "class-transformer";
+import { EventRegistration } from "../../eventRegistration/base/EventRegistration";
 
 @ObjectType()
 class Event {
@@ -23,6 +24,15 @@ class Event {
   @Type(() => Date)
   @Field(() => Date)
   createdAt!: Date;
+
+  @ApiProperty({
+    required: false,
+    type: () => [EventRegistration],
+  })
+  @ValidateNested()
+  @Type(() => EventRegistration)
+  @IsOptional()
+  eventRegistrations?: Array<EventRegistration>;
 
   @ApiProperty({
     required: true,

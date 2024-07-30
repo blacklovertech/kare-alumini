@@ -11,12 +11,25 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { StringFilter } from "../../util/StringFilter";
+import { EventRegistrationListRelationFilter } from "../../eventRegistration/base/EventRegistrationListRelationFilter";
+import { ValidateNested, IsOptional } from "class-validator";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { StringFilter } from "../../util/StringFilter";
 
 @InputType()
 class EventWhereInput {
+  @ApiProperty({
+    required: false,
+    type: () => EventRegistrationListRelationFilter,
+  })
+  @ValidateNested()
+  @Type(() => EventRegistrationListRelationFilter)
+  @IsOptional()
+  @Field(() => EventRegistrationListRelationFilter, {
+    nullable: true,
+  })
+  eventRegistrations?: EventRegistrationListRelationFilter;
+
   @ApiProperty({
     required: false,
     type: StringFilter,

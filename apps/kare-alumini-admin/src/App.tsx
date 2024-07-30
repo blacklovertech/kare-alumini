@@ -17,6 +17,10 @@ import { DonationList } from "./donation/DonationList";
 import { DonationCreate } from "./donation/DonationCreate";
 import { DonationEdit } from "./donation/DonationEdit";
 import { DonationShow } from "./donation/DonationShow";
+import { EventList } from "./event/EventList";
+import { EventCreate } from "./event/EventCreate";
+import { EventEdit } from "./event/EventEdit";
+import { EventShow } from "./event/EventShow";
 import { JobBoardList } from "./jobBoard/JobBoardList";
 import { JobBoardCreate } from "./jobBoard/JobBoardCreate";
 import { JobBoardEdit } from "./jobBoard/JobBoardEdit";
@@ -29,10 +33,6 @@ import { GeolocationList } from "./geolocation/GeolocationList";
 import { GeolocationCreate } from "./geolocation/GeolocationCreate";
 import { GeolocationEdit } from "./geolocation/GeolocationEdit";
 import { GeolocationShow } from "./geolocation/GeolocationShow";
-import { EventList } from "./event/EventList";
-import { EventCreate } from "./event/EventCreate";
-import { EventEdit } from "./event/EventEdit";
-import { EventShow } from "./event/EventShow";
 import { NewsAnnouncementList } from "./newsAnnouncement/NewsAnnouncementList";
 import { NewsAnnouncementCreate } from "./newsAnnouncement/NewsAnnouncementCreate";
 import { NewsAnnouncementEdit } from "./newsAnnouncement/NewsAnnouncementEdit";
@@ -65,6 +65,30 @@ import { EventItemList } from "./eventItem/EventItemList";
 import { EventItemCreate } from "./eventItem/EventItemCreate";
 import { EventItemEdit } from "./eventItem/EventItemEdit";
 import { EventItemShow } from "./eventItem/EventItemShow";
+import { MessageList } from "./message/MessageList";
+import { MessageCreate } from "./message/MessageCreate";
+import { MessageEdit } from "./message/MessageEdit";
+import { MessageShow } from "./message/MessageShow";
+import { RoleList } from "./role/RoleList";
+import { RoleCreate } from "./role/RoleCreate";
+import { RoleEdit } from "./role/RoleEdit";
+import { RoleShow } from "./role/RoleShow";
+import { UserRoleList } from "./userRole/UserRoleList";
+import { UserRoleCreate } from "./userRole/UserRoleCreate";
+import { UserRoleEdit } from "./userRole/UserRoleEdit";
+import { UserRoleShow } from "./userRole/UserRoleShow";
+import { EventRegistrationList } from "./eventRegistration/EventRegistrationList";
+import { EventRegistrationCreate } from "./eventRegistration/EventRegistrationCreate";
+import { EventRegistrationEdit } from "./eventRegistration/EventRegistrationEdit";
+import { EventRegistrationShow } from "./eventRegistration/EventRegistrationShow";
+import { ProfileList } from "./profile/ProfileList";
+import { ProfileCreate } from "./profile/ProfileCreate";
+import { ProfileEdit } from "./profile/ProfileEdit";
+import { ProfileShow } from "./profile/ProfileShow";
+import { NotificationList } from "./notification/NotificationList";
+import { NotificationCreate } from "./notification/NotificationCreate";
+import { NotificationEdit } from "./notification/NotificationEdit";
+import { NotificationShow } from "./notification/NotificationShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -113,6 +137,13 @@ const App = (): React.ReactElement => {
           show={DonationShow}
         />
         <Resource
+          name="Event"
+          list={EventList}
+          edit={EventEdit}
+          create={EventCreate}
+          show={EventShow}
+        />
+        <Resource
           name="JobBoard"
           list={JobBoardList}
           edit={JobBoardEdit}
@@ -132,13 +163,6 @@ const App = (): React.ReactElement => {
           edit={GeolocationEdit}
           create={GeolocationCreate}
           show={GeolocationShow}
-        />
-        <Resource
-          name="Event"
-          list={EventList}
-          edit={EventEdit}
-          create={EventCreate}
-          show={EventShow}
         />
         <Resource
           name="NewsAnnouncement"
@@ -195,6 +219,48 @@ const App = (): React.ReactElement => {
           edit={EventItemEdit}
           create={EventItemCreate}
           show={EventItemShow}
+        />
+        <Resource
+          name="Message"
+          list={MessageList}
+          edit={MessageEdit}
+          create={MessageCreate}
+          show={MessageShow}
+        />
+        <Resource
+          name="Role"
+          list={RoleList}
+          edit={RoleEdit}
+          create={RoleCreate}
+          show={RoleShow}
+        />
+        <Resource
+          name="UserRole"
+          list={UserRoleList}
+          edit={UserRoleEdit}
+          create={UserRoleCreate}
+          show={UserRoleShow}
+        />
+        <Resource
+          name="EventRegistration"
+          list={EventRegistrationList}
+          edit={EventRegistrationEdit}
+          create={EventRegistrationCreate}
+          show={EventRegistrationShow}
+        />
+        <Resource
+          name="Profile"
+          list={ProfileList}
+          edit={ProfileEdit}
+          create={ProfileCreate}
+          show={ProfileShow}
+        />
+        <Resource
+          name="Notification"
+          list={NotificationList}
+          edit={NotificationEdit}
+          create={NotificationCreate}
+          show={NotificationShow}
         />
       </Admin>
     </div>

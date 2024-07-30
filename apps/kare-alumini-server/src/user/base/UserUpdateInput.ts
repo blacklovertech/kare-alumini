@@ -11,10 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, MaxLength } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  ValidateNested,
+  MaxLength,
+} from "class-validator";
+import { EventRegistrationUpdateManyWithoutUsersInput } from "./EventRegistrationUpdateManyWithoutUsersInput";
+import { Type } from "class-transformer";
+import { ProfileUpdateManyWithoutUsersInput } from "./ProfileUpdateManyWithoutUsersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { UserRoleUpdateManyWithoutUsersInput } from "./UserRoleUpdateManyWithoutUsersInput";
 
 @InputType()
 class UserUpdateInput {
@@ -28,6 +37,18 @@ class UserUpdateInput {
     nullable: true,
   })
   email?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EventRegistrationUpdateManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => EventRegistrationUpdateManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => EventRegistrationUpdateManyWithoutUsersInput, {
+    nullable: true,
+  })
+  eventRegistrations?: EventRegistrationUpdateManyWithoutUsersInput;
 
   @ApiProperty({
     required: false,
@@ -66,6 +87,18 @@ class UserUpdateInput {
 
   @ApiProperty({
     required: false,
+    type: () => ProfileUpdateManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => ProfileUpdateManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => ProfileUpdateManyWithoutUsersInput, {
+    nullable: true,
+  })
+  profiles?: ProfileUpdateManyWithoutUsersInput;
+
+  @ApiProperty({
+    required: false,
   })
   @IsJSONValue()
   @IsOptional()
@@ -73,6 +106,18 @@ class UserUpdateInput {
     nullable: true,
   })
   roles?: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserRoleUpdateManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => UserRoleUpdateManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => UserRoleUpdateManyWithoutUsersInput, {
+    nullable: true,
+  })
+  userRoles?: UserRoleUpdateManyWithoutUsersInput;
 
   @ApiProperty({
     required: false,

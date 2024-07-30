@@ -9,5 +9,25 @@ https://docs.amplication.com/how-to/custom-code
 
 ------------------------------------------------------------------------------
   */
-class EventUpdateInput {}
+import { InputType, Field } from "@nestjs/graphql";
+import { ApiProperty } from "@nestjs/swagger";
+import { EventRegistrationUpdateManyWithoutEventsInput } from "./EventRegistrationUpdateManyWithoutEventsInput";
+import { ValidateNested, IsOptional } from "class-validator";
+import { Type } from "class-transformer";
+
+@InputType()
+class EventUpdateInput {
+  @ApiProperty({
+    required: false,
+    type: () => EventRegistrationUpdateManyWithoutEventsInput,
+  })
+  @ValidateNested()
+  @Type(() => EventRegistrationUpdateManyWithoutEventsInput)
+  @IsOptional()
+  @Field(() => EventRegistrationUpdateManyWithoutEventsInput, {
+    nullable: true,
+  })
+  eventRegistrations?: EventRegistrationUpdateManyWithoutEventsInput;
+}
+
 export { EventUpdateInput as EventUpdateInput };

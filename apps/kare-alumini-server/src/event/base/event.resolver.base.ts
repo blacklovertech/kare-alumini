@@ -18,11 +18,16 @@ import * as gqlACGuard from "../../auth/gqlAC.guard";
 import { GqlDefaultAuthGuard } from "../../auth/gqlDefaultAuth.guard";
 import * as common from "@nestjs/common";
 import { AclFilterResponseInterceptor } from "../../interceptors/aclFilterResponse.interceptor";
+import { AclValidateRequestInterceptor } from "../../interceptors/aclValidateRequest.interceptor";
 import { Event } from "./Event";
 import { EventCountArgs } from "./EventCountArgs";
 import { EventFindManyArgs } from "./EventFindManyArgs";
 import { EventFindUniqueArgs } from "./EventFindUniqueArgs";
+import { CreateEventArgs } from "./CreateEventArgs";
+import { UpdateEventArgs } from "./UpdateEventArgs";
 import { DeleteEventArgs } from "./DeleteEventArgs";
+import { EventRegistrationFindManyArgs } from "../../eventRegistration/base/EventRegistrationFindManyArgs";
+import { EventRegistration } from "../../eventRegistration/base/EventRegistration";
 import { EventService } from "../event.service";
 @common.UseGuards(GqlDefaultAuthGuard, gqlACGuard.GqlACGuard)
 @graphql.Resolver(() => Event)
@@ -75,6 +80,45 @@ export class EventResolverBase {
     return result;
   }
 
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => Event)
+  @nestAccessControl.UseRoles({
+    resource: "Event",
+    action: "create",
+    possession: "any",
+  })
+  async createEvent(@graphql.Args() args: CreateEventArgs): Promise<Event> {
+    return await this.service.createEvent({
+      ...args,
+      data: args.data,
+    });
+  }
+
+  @common.UseInterceptors(AclValidateRequestInterceptor)
+  @graphql.Mutation(() => Event)
+  @nestAccessControl.UseRoles({
+    resource: "Event",
+    action: "update",
+    possession: "any",
+  })
+  async updateEvent(
+    @graphql.Args() args: UpdateEventArgs
+  ): Promise<Event | null> {
+    try {
+      return await this.service.updateEvent({
+        ...args,
+        data: args.data,
+      });
+    } catch (error) {
+      if (isRecordNotFoundError(error)) {
+        throw new GraphQLError(
+          `No resource was found for ${JSON.stringify(args.where)}`
+        );
+      }
+      throw error;
+    }
+  }
+
   @graphql.Mutation(() => Event)
   @nestAccessControl.UseRoles({
     resource: "Event",
@@ -94,5 +138,27 @@ export class EventResolverBase {
       }
       throw error;
     }
+  }
+
+  @common.UseInterceptors(AclFilterResponseInterceptor)
+  @graphql.ResolveField(() => [EventRegistration], {
+    name: "eventRegistrations",
+  })
+  @nestAccessControl.UseRoles({
+    resource: "EventRegistration",
+    action: "read",
+    possession: "any",
+  })
+  async findEventRegistrations(
+    @graphql.Parent() parent: Event,
+    @graphql.Args() args: EventRegistrationFindManyArgs
+  ): Promise<EventRegistration[]> {
+    const results = await this.service.findEventRegistrations(parent.id, args);
+
+    if (!results) {
+      return [];
+    }
+
+    return results;
   }
 }

@@ -11,10 +11,19 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsOptional, MaxLength } from "class-validator";
+import {
+  IsString,
+  IsOptional,
+  ValidateNested,
+  MaxLength,
+} from "class-validator";
+import { EventRegistrationCreateNestedManyWithoutUsersInput } from "./EventRegistrationCreateNestedManyWithoutUsersInput";
+import { Type } from "class-transformer";
+import { ProfileCreateNestedManyWithoutUsersInput } from "./ProfileCreateNestedManyWithoutUsersInput";
 import { IsJSONValue } from "../../validators";
 import { GraphQLJSON } from "graphql-type-json";
 import { InputJsonValue } from "../../types";
+import { UserRoleCreateNestedManyWithoutUsersInput } from "./UserRoleCreateNestedManyWithoutUsersInput";
 
 @InputType()
 class UserCreateInput {
@@ -28,6 +37,18 @@ class UserCreateInput {
     nullable: true,
   })
   email?: string | null;
+
+  @ApiProperty({
+    required: false,
+    type: () => EventRegistrationCreateNestedManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => EventRegistrationCreateNestedManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => EventRegistrationCreateNestedManyWithoutUsersInput, {
+    nullable: true,
+  })
+  eventRegistrations?: EventRegistrationCreateNestedManyWithoutUsersInput;
 
   @ApiProperty({
     required: false,
@@ -62,11 +83,35 @@ class UserCreateInput {
   password!: string;
 
   @ApiProperty({
+    required: false,
+    type: () => ProfileCreateNestedManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => ProfileCreateNestedManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => ProfileCreateNestedManyWithoutUsersInput, {
+    nullable: true,
+  })
+  profiles?: ProfileCreateNestedManyWithoutUsersInput;
+
+  @ApiProperty({
     required: true,
   })
   @IsJSONValue()
   @Field(() => GraphQLJSON)
   roles!: InputJsonValue;
+
+  @ApiProperty({
+    required: false,
+    type: () => UserRoleCreateNestedManyWithoutUsersInput,
+  })
+  @ValidateNested()
+  @Type(() => UserRoleCreateNestedManyWithoutUsersInput)
+  @IsOptional()
+  @Field(() => UserRoleCreateNestedManyWithoutUsersInput, {
+    nullable: true,
+  })
+  userRoles?: UserRoleCreateNestedManyWithoutUsersInput;
 
   @ApiProperty({
     required: true,
