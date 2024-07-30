@@ -13,13 +13,36 @@ import { InputType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
 import { StringNullableFilter } from "../../util/StringNullableFilter";
 import { Type } from "class-transformer";
-import { IsOptional } from "class-validator";
+import { IsOptional, IsEnum } from "class-validator";
+import { EnumUserProfileBloodGroup } from "./EnumUserProfileBloodGroup";
 import { StringFilter } from "../../util/StringFilter";
 import { BooleanNullableFilter } from "../../util/BooleanNullableFilter";
 import { IntNullableFilter } from "../../util/IntNullableFilter";
 
 @InputType()
 class UserProfileWhereInput {
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  address?: StringNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumUserProfileBloodGroup,
+  })
+  @IsEnum(EnumUserProfileBloodGroup)
+  @IsOptional()
+  @Field(() => EnumUserProfileBloodGroup, {
+    nullable: true,
+  })
+  bloodGroup?: "Option1";
+
   @ApiProperty({
     required: false,
     type: StringNullableFilter,
@@ -184,6 +207,17 @@ class UserProfileWhereInput {
     nullable: true,
   })
   postNews?: BooleanNullableFilter;
+
+  @ApiProperty({
+    required: false,
+    type: StringNullableFilter,
+  })
+  @Type(() => StringNullableFilter)
+  @IsOptional()
+  @Field(() => StringNullableFilter, {
+    nullable: true,
+  })
+  regNo?: StringNullableFilter;
 }
 
 export { UserProfileWhereInput as UserProfileWhereInput };

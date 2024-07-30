@@ -33,6 +33,8 @@ export class UserProfileControllerBase {
     return await this.service.createUserProfile({
       data: data,
       select: {
+        address: true,
+        bloodGroup: true,
         createdAt: true,
         currentCompany: true,
         currentRole: true,
@@ -49,6 +51,7 @@ export class UserProfileControllerBase {
         phoneNumber: true,
         postEvents: true,
         postNews: true,
+        regNo: true,
         updatedAt: true,
       },
     });
@@ -62,6 +65,8 @@ export class UserProfileControllerBase {
     return this.service.userProfiles({
       ...args,
       select: {
+        address: true,
+        bloodGroup: true,
         createdAt: true,
         currentCompany: true,
         currentRole: true,
@@ -78,6 +83,7 @@ export class UserProfileControllerBase {
         phoneNumber: true,
         postEvents: true,
         postNews: true,
+        regNo: true,
         updatedAt: true,
       },
     });
@@ -92,6 +98,8 @@ export class UserProfileControllerBase {
     const result = await this.service.userProfile({
       where: params,
       select: {
+        address: true,
+        bloodGroup: true,
         createdAt: true,
         currentCompany: true,
         currentRole: true,
@@ -108,6 +116,7 @@ export class UserProfileControllerBase {
         phoneNumber: true,
         postEvents: true,
         postNews: true,
+        regNo: true,
         updatedAt: true,
       },
     });
@@ -131,6 +140,8 @@ export class UserProfileControllerBase {
         where: params,
         data: data,
         select: {
+          address: true,
+          bloodGroup: true,
           createdAt: true,
           currentCompany: true,
           currentRole: true,
@@ -147,6 +158,7 @@ export class UserProfileControllerBase {
           phoneNumber: true,
           postEvents: true,
           postNews: true,
+          regNo: true,
           updatedAt: true,
         },
       });
@@ -170,6 +182,8 @@ export class UserProfileControllerBase {
       return await this.service.deleteUserProfile({
         where: params,
         select: {
+          address: true,
+          bloodGroup: true,
           createdAt: true,
           currentCompany: true,
           currentRole: true,
@@ -186,6 +200,7 @@ export class UserProfileControllerBase {
           phoneNumber: true,
           postEvents: true,
           postNews: true,
+          regNo: true,
           updatedAt: true,
         },
       });

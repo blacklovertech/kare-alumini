@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
-import { NetworkingToolsModule } from "./networkingTools/networkingTools.module";
 import { UserProfileModule } from "./userProfile/userProfile.module";
+import { NetworkingToolsModule } from "./networkingTools/networkingTools.module";
 import { DonationModule } from "./donation/donation.module";
 import { EventModule } from "./event/event.module";
 import { JobBoardModule } from "./jobBoard/jobBoard.module";
@@ -9,6 +9,7 @@ import { GeolocationModule } from "./geolocation/geolocation.module";
 import { NewsAnnouncementModule } from "./newsAnnouncement/newsAnnouncement.module";
 import { MentorshipProgramModule } from "./mentorshipProgram/mentorshipProgram.module";
 import { DiscussionForumModule } from "./discussionForum/discussionForum.module";
+import { AdminModule } from "./admin/admin.module";
 import { HealthModule } from "./health/health.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SecretsManagerModule } from "./providers/secrets/secretsManager.module";
@@ -21,8 +22,8 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
 @Module({
   controllers: [],
   imports: [
-    NetworkingToolsModule,
     UserProfileModule,
+    NetworkingToolsModule,
     DonationModule,
     EventModule,
     JobBoardModule,
@@ -31,6 +32,7 @@ import { ApolloDriver, ApolloDriverConfig } from "@nestjs/apollo";
     NewsAnnouncementModule,
     MentorshipProgramModule,
     DiscussionForumModule,
+    AdminModule,
     HealthModule,
     PrismaModule,
     SecretsManagerModule,

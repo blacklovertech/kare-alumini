@@ -1,9 +1,11 @@
 import * as React from "react";
+
 import {
   Edit,
   SimpleForm,
   EditProps,
   TextInput,
+  SelectInput,
   BooleanInput,
   NumberInput,
 } from "react-admin";
@@ -12,6 +14,15 @@ export const UserProfileEdit = (props: EditProps): React.ReactElement => {
   return (
     <Edit {...props}>
       <SimpleForm>
+        <TextInput label="Address" multiline source="address" />
+        <SelectInput
+          source="bloodGroup"
+          label="BloodGroup"
+          choices={[{ label: "Option 1", value: "Option1" }]}
+          optionText="label"
+          allowEmpty
+          optionValue="value"
+        />
         <TextInput label="CurrentCompany" source="currentCompany" />
         <TextInput label="CurrentRole" source="currentRole" />
         <TextInput label="DeptOfStudy" source="deptOfStudy" />
@@ -26,6 +37,7 @@ export const UserProfileEdit = (props: EditProps): React.ReactElement => {
         <TextInput label="PhoneNumber" source="phoneNumber" />
         <BooleanInput label="PostEvents" source="postEvents" />
         <BooleanInput label="PostNews" source="postNews" />
+        <TextInput label="RegNo" source="regNo" />
       </SimpleForm>
     </Edit>
   );

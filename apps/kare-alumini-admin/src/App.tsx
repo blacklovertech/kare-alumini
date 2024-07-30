@@ -5,14 +5,14 @@ import { theme } from "./theme/theme";
 import Login from "./Login";
 import "./App.scss";
 import Dashboard from "./pages/Dashboard";
-import { NetworkingToolsList } from "./networkingTools/NetworkingToolsList";
-import { NetworkingToolsCreate } from "./networkingTools/NetworkingToolsCreate";
-import { NetworkingToolsEdit } from "./networkingTools/NetworkingToolsEdit";
-import { NetworkingToolsShow } from "./networkingTools/NetworkingToolsShow";
 import { UserProfileList } from "./userProfile/UserProfileList";
 import { UserProfileCreate } from "./userProfile/UserProfileCreate";
 import { UserProfileEdit } from "./userProfile/UserProfileEdit";
 import { UserProfileShow } from "./userProfile/UserProfileShow";
+import { NetworkingToolsList } from "./networkingTools/NetworkingToolsList";
+import { NetworkingToolsCreate } from "./networkingTools/NetworkingToolsCreate";
+import { NetworkingToolsEdit } from "./networkingTools/NetworkingToolsEdit";
+import { NetworkingToolsShow } from "./networkingTools/NetworkingToolsShow";
 import { DonationList } from "./donation/DonationList";
 import { DonationCreate } from "./donation/DonationCreate";
 import { DonationEdit } from "./donation/DonationEdit";
@@ -45,6 +45,10 @@ import { DiscussionForumList } from "./discussionForum/DiscussionForumList";
 import { DiscussionForumCreate } from "./discussionForum/DiscussionForumCreate";
 import { DiscussionForumEdit } from "./discussionForum/DiscussionForumEdit";
 import { DiscussionForumShow } from "./discussionForum/DiscussionForumShow";
+import { AdminList } from "./admin/AdminList";
+import { AdminCreate } from "./admin/AdminCreate";
+import { AdminEdit } from "./admin/AdminEdit";
+import { AdminShow } from "./admin/AdminShow";
 import { jwtAuthProvider } from "./auth-provider/ra-auth-jwt";
 
 const App = (): React.ReactElement => {
@@ -72,18 +76,18 @@ const App = (): React.ReactElement => {
         loginPage={Login}
       >
         <Resource
-          name="NetworkingTools"
-          list={NetworkingToolsList}
-          edit={NetworkingToolsEdit}
-          create={NetworkingToolsCreate}
-          show={NetworkingToolsShow}
-        />
-        <Resource
           name="UserProfile"
           list={UserProfileList}
           edit={UserProfileEdit}
           create={UserProfileCreate}
           show={UserProfileShow}
+        />
+        <Resource
+          name="NetworkingTools"
+          list={NetworkingToolsList}
+          edit={NetworkingToolsEdit}
+          create={NetworkingToolsCreate}
+          show={NetworkingToolsShow}
         />
         <Resource
           name="Donation"
@@ -140,6 +144,13 @@ const App = (): React.ReactElement => {
           edit={DiscussionForumEdit}
           create={DiscussionForumCreate}
           show={DiscussionForumShow}
+        />
+        <Resource
+          name="Admin"
+          list={AdminList}
+          edit={AdminEdit}
+          create={AdminCreate}
+          show={AdminShow}
         />
       </Admin>
     </div>

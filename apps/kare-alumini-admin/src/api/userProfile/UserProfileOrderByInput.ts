@@ -1,6 +1,8 @@
 import { SortOrder } from "../../util/SortOrder";
 
 export type UserProfileOrderByInput = {
+  address?: SortOrder;
+  bloodGroup?: SortOrder;
   createdAt?: SortOrder;
   currentCompany?: SortOrder;
   currentRole?: SortOrder;
@@ -17,5 +19,6 @@ export type UserProfileOrderByInput = {
   phoneNumber?: SortOrder;
   postEvents?: SortOrder;
   postNews?: SortOrder;
+  regNo?: SortOrder;
   updatedAt?: SortOrder;
 };

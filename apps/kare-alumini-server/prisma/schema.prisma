@@ -7,20 +7,16 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model NetworkingTools {
-  createdAt DateTime @default(now())
-  id        String   @id @default(cuid())
-  updatedAt DateTime @updatedAt
-}
-
 model UserProfile {
-  createdAt      DateTime @default(now())
+  address        String?
+  bloodGroup     EnumUserProfileBloodGroup?
+  createdAt      DateTime                   @default(now())
   currentCompany String?
   currentRole    String?
   deptOfStudy    String?
   email          String?
   githubUrl      String?
-  id             String   @id @default(cuid())
+  id             String                     @id @default(cuid())
   instagramUrl   String?
   linkedInUrl    String?
   moreAboutUser  String?
@@ -30,7 +26,14 @@ model UserProfile {
   phoneNumber    String?
   postEvents     Boolean?
   postNews       Boolean?
-  updatedAt      DateTime @updatedAt
+  regNo          String?
+  updatedAt      DateTime                   @updatedAt
+}
+
+model NetworkingTools {
+  createdAt DateTime @default(now())
+  id        String   @id @default(cuid())
+  updatedAt DateTime @updatedAt
 }
 
 model Donation {
@@ -79,4 +82,25 @@ model DiscussionForum {
   createdAt DateTime @default(now())
   id        String   @id @default(cuid())
   updatedAt DateTime @updatedAt
+}
+
+model Admin {
+  createdAt   DateTime       @default(now())
+  email       String?
+  id          String         @id @default(cuid())
+  isActive    Boolean?
+  lastLogin   DateTime?
+  name        String?
+  password    String?
+  phoneNumber String?
+  role        EnumAdminRole?
+  updatedAt   DateTime       @updatedAt
+}
+
+enum EnumUserProfileBloodGroup {
+  Option1
+}
+
+enum EnumAdminRole {
+  Option1
 }

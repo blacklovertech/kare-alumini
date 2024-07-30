@@ -11,20 +11,47 @@ https://docs.amplication.com/how-to/custom-code
   */
 import { ObjectType, Field } from "@nestjs/graphql";
 import { ApiProperty } from "@nestjs/swagger";
+
 import {
-  IsDate,
   IsString,
   MaxLength,
   IsOptional,
+  IsEnum,
+  IsDate,
   IsBoolean,
   IsInt,
   Min,
   Max,
 } from "class-validator";
+
+import { EnumUserProfileBloodGroup } from "./EnumUserProfileBloodGroup";
 import { Type } from "class-transformer";
 
 @ObjectType()
 class UserProfile {
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  address!: string | null;
+
+  @ApiProperty({
+    required: false,
+    enum: EnumUserProfileBloodGroup,
+  })
+  @IsEnum(EnumUserProfileBloodGroup)
+  @IsOptional()
+  @Field(() => EnumUserProfileBloodGroup, {
+    nullable: true,
+  })
+  bloodGroup?: "Option1" | null;
+
   @ApiProperty({
     required: true,
   })
@@ -205,6 +232,18 @@ class UserProfile {
     nullable: true,
   })
   postNews!: boolean | null;
+
+  @ApiProperty({
+    required: false,
+    type: String,
+  })
+  @IsString()
+  @MaxLength(1000)
+  @IsOptional()
+  @Field(() => String, {
+    nullable: true,
+  })
+  regNo!: string | null;
 
   @ApiProperty({
     required: true,
